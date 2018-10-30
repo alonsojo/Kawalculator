@@ -1,3 +1,5 @@
 ﻿  kawalculator.cpp
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(85): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(109): warning C4018: '<': signed/unsigned mismatch
   Kawalculator.vcxproj -> C:\Users\josel\Documents\GitHub\Kawalculator\Kawalculator\Debug\Kawalculator.exe
   Kawalculator.vcxproj -> C:\Users\josel\Documents\GitHub\Kawalculator\Kawalculator\Debug\Kawalculator.pdb (Partial PDB)
