@@ -1,12 +1,13 @@
 ﻿  kawalculator.cpp
 c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(56): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(78): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(107): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(128): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(148): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(157): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(173): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(177): warning C4018: '<': signed/unsigned mismatch
-c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(188): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(89): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(98): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(127): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(150): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(170): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(179): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(195): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(199): warning C4018: '<': signed/unsigned mismatch
+c:\users\josel\documents\github\kawalculator\kawalculator\kawalculator\kawalculator.cpp(216): warning C4018: '<': signed/unsigned mismatch
   Kawalculator.vcxproj -> C:\Users\josel\Documents\GitHub\Kawalculator\Kawalculator\Debug\Kawalculator.exe
   Kawalculator.vcxproj -> C:\Users\josel\Documents\GitHub\Kawalculator\Kawalculator\Debug\Kawalculator.pdb (Partial PDB)

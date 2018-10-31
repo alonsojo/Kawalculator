@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		int len = 0, i=0,j = 0;
 		for (i = 0; i < input.length(); i++)
 		{
-
+			//If [i] is a digit, ot iterates until it find a non digit non period
 			if (isdigit(input[i]) || input[i]=='.')
 			{
 				j = i;
@@ -64,14 +64,34 @@ int main(int argc, char *argv[])
 					len++;
 					j++;
 				}
+				//negative sign case
+				if (i > 0 && input[i - 1] == '-')
+				{
+					i--;
+					len++;
+				}
+				if (i > 1 && input[i - 1] == '-' && !isdigit(input[i - 2]))
+				{
+					i--;
+					len++;
+				}
+				//pushes number into stack
 				wordVector.push_back(input.substr(i, len));
 				i = j - 1;
 				len = 0;
 			}
 			else 
-			{
-				wordVector.push_back(input.substr(i, 1));
-				
+			{			
+				if (input[i] == '-')
+				{
+					if (i == 0)
+						continue;
+					if (i>0 && i<input.length() - 1)
+						if (!isdigit(input[i - 1]) && !isdigit(input[i + 1]))
+							wordVector.push_back(input.substr(i, 1));
+				}
+				else
+					wordVector.push_back(input.substr(i, 1));
 			}
 		}
 		//Tokens
@@ -125,6 +145,8 @@ bool validateInput(string input)
 	bool valid = true;
 	int leftPar = 0, rightPar = 0;
 
+	if (input == "" || input.empty() == true)
+		return false;
 	for (int i = 0; i < input.length(); i++)
 	{
 	
@@ -183,6 +205,12 @@ bool validateInput(string input)
 					return false;
 			//() case
 			if ((input[i] == allowedSPSymbols[0] && input[i + 1] == allowedSPSymbols[1]))
+				return false;
+			//#( case
+			if (input[i] == allowedSPSymbols[0] && isdigit(input[i - 1]))
+				return false;
+			//)# case
+			if (input[i] == allowedSPSymbols[1] && isdigit(input[i + 1]))
 				return false;
 			//Operators +*/^ can only have a DIGIT OR [)] in the left OR a DIGIT, [(] or [-] on the right side
 			for (int j = 2; j < allowedSPSymbols.length() - 2; j++)
