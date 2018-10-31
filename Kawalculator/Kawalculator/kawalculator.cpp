@@ -124,6 +124,7 @@ vector<string> transformToRPN(const vector<string> &tokens)
 			tempStack.pop();
 		}
 
+		//Pushes remaining operators
 		if (isOperator(tokens[i]))
 		{
 			while (!tempStack.empty() && getOpPriority(tempStack.top()) >= getOpPriority(tokens[i]))
@@ -134,7 +135,7 @@ vector<string> transformToRPN(const vector<string> &tokens)
 			tempStack.push(tokens[i]);
 		}
 	}
-	//pop any remaining operators from the stack and insert to outputlist
+	//pops any remaining operators from the stack and insert to result stack
 	while (!tempStack.empty())
 	{
 		resultStack.push_back(tempStack.top());
@@ -149,52 +150,60 @@ vector<string> transformToRPN(const vector<string> &tokens)
 	return resultStack;
 }
 
+//Evaluates RPN expression
 double evaluateRPN(vector<string> expression)
 {
-	double result = 0.0, n = 0.0;
-	stack<double> s;
+	double result = 0.0, nDouble = 0.0;
+	stack<double> tempStack;
 	//reverse(expression.begin(), expression.end());
 	for (int i = 0; i < expression.size(); i++)
 	{
-
-		if (isDouble(expression[i]) == true)
+		//Pushes doubles
+		if (isDouble(expression[i]))
 		{
-			n = stod(expression[i]);
-			s.push(n);
+			nDouble = stod(expression[i]);
+			tempStack.push(nDouble);
 		}
+		////Claulates addition
 		if (expression[i] == "+")
 		{
-			double x = s.top();
-			s.pop();
-			double y = s.top();
-			s.pop();
+			double x = tempStack.top();
+			tempStack.pop();
+			double y = tempStack.top();
+			tempStack.pop();
 			result = x + y;
-			s.push(result);
+			tempStack.push(result);
 		}
+
+		//Calculates substraction
 		if (expression[i] == "-")
 		{
-			double x = s.top();
-			s.pop();
-			double y = s.top();
-			s.pop();
+			double x = tempStack.top();
+			tempStack.pop();
+			double y = tempStack.top();
+			tempStack.pop();
 			result = y - x;
-			s.push(result);
+			tempStack.push(result);
 		}
+
+		//Calculates multiplication
 		if (expression[i] == "*")
 		{
-			double x = s.top();
-			s.pop();
-			double y = s.top();
-			s.pop();
+			double x = tempStack.top();
+			tempStack.pop();
+			double y = tempStack.top();
+			tempStack.pop();
 			result = x*y;
-			s.push(result);
+			tempStack.push(result);
 		}
+
+		//Calculates Division
 		if (expression[i]== "/")
 		{
-			double x = s.top();
-			s.pop();
-			double y = s.top();
-			s.pop();
+			double x = tempStack.top();
+			tempStack.pop();
+			double y = tempStack.top();
+			tempStack.pop();
 			if (x != 0)
 				result = y / x;
 			else
@@ -202,28 +211,33 @@ double evaluateRPN(vector<string> expression)
 				cout << "Couldn't perform division by zero!" << endl;
 				break;
 			}
-			s.push(result);
+			tempStack.push(result);
 		}
+
+		//Exponentiation.
 		if (expression[i]== "^")
 		{
-			double x = s.top();
-			s.pop();
-			double y = s.top();
-			s.pop();
+			double x = tempStack.top();
+			tempStack.pop();
+			double y = tempStack.top();
+			tempStack.pop();
 			result = pow(y,x);
-			s.push(result);
+			tempStack.push(result);
 		}
+
+		//Unary negative sign
 		if (expression[i] == "#")
 		{
-			double x = s.top();
-			s.pop();
+			double x = tempStack.top();
+			tempStack.pop();
 			result = x*(-1);
-			s.push(result);
+			tempStack.push(result);
 		}
 	}
 	return result;
 }
 
+//Checks i a number is L
 bool isDouble(const string& s)
 {
 	try
@@ -237,6 +251,7 @@ bool isDouble(const string& s)
 	return true;
 }
 
+//Tokenizes string
 vector<string> tokenize( string input)
 {
 	//Tokenizes input based on allowed characters
@@ -253,19 +268,7 @@ vector<string> tokenize( string input)
 				len++;
 				j++;
 			}
-			//negative sign case
-			/*if (i == 1 && input[i - 1] == '-')
-			{
-				//input.at(i) = '#';
-				//i--;
-				len++;t
-			}
-			if (i > 1 && input[i - 1] == '-' && !isdigit(input[i - 2]))
-			{
-				input.at(i) = '#';
-				i--;
-				len++;
-			*/
+			
 			//pushes number into stack
 			wordVector.push_back(input.substr(i, len));
 			i = j - 1;
@@ -293,6 +296,7 @@ vector<string> tokenize( string input)
 	return wordVector;
 }
 
+//Checks if a character is valid
 bool isValidSPChar(char letter)
 {
 	bool valid = false;
@@ -302,6 +306,7 @@ bool isValidSPChar(char letter)
 	return valid;
 }
 
+//Validates input
 bool validateInput(string input)
 {
 	bool valid = true;
@@ -403,23 +408,22 @@ bool validateInput(string input)
 	return true;
 }
 
+//Atempts to check if number is OK to use
 bool tryParsingNum(const string &symbol)
 {
 	bool isNumber = false;
 	for (unsigned int i = 0; i < symbol.size(); i++)
 	{
 		if (!isdigit(symbol[i]))
-		{
 			isNumber = false;
-		}
 		else
-		{
 			isNumber = true;
-		}
 	}
+
 	return isNumber;
 }
 
+//Returns priority of that specific exponent
 int getOpPriority(const string &c)
 {
 	if (c == "^" || c == "#")
@@ -439,7 +443,8 @@ int getOpPriority(const string &c)
 		return 0;
 	}
 }
-//
+
+//Checks if an specific char is a available
 bool isOperator(const string &c)
 {
 	return (c == "+" || c == "-" || c == "*" || c == "/" || c == "^" || c == "#");
