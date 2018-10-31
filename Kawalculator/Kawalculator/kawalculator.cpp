@@ -6,8 +6,7 @@ using namespace std;
 
 //Constant Values
 //Allowed characters
-char allowedSPSymbols[] = { '(',')','+','-','*','/','^','.' };
-int spsLength = sizeof(allowedSPSymbols) / sizeof(allowedSPSymbols[0]);
+string allowedSPSymbols = "()+*/^-.";
 
 //Function Prototypes
 bool isValidSPChar(char letter);
@@ -71,7 +70,7 @@ bool isValidSPChar(char letter)
 	bool valid = false;
 	
 
-	for (int i = 0; i < spsLength; i++)
+	for (int i = 0; i < allowedSPSymbols.length(); i++)
 		if (letter == allowedSPSymbols[i])
 			valid = true;
 	return valid;
@@ -87,45 +86,63 @@ bool validateInput(string input)
 		//Not a digit
 		if (!isdigit(input[i]))
 		{
-			//First character can only be an ( or a digit
+			//Not a digit & not an allowed sp char
+			if (!isValidSPChar(input[i]))
+				return false;
+			//First character can only be an [(], a digit or [-] 
 			if (i == 0)
 			{
-				for (int j = 1; j < spsLength; j++)
+				//Negative sign
+				if (input[i] == allowedSPSymbols[6])
+					if (!isdigit(input[i + 1]))
+						return false;
+				for (int j = 1; j < allowedSPSymbols.length(); j++)
 				{
-					if (input[0] == allowedSPSymbols[j])
+					if (input[0] == allowedSPSymbols[j] && j != 6)
 						return false;
 				}
 			}
-			//Not a digit & not an allowd sp char
-			if(!isValidSPChar(input[i]))
-				return false;
+			
 			//Not a digit, but a (
-			else if (input[i] == allowedSPSymbols[0])
+			if (input[i] == allowedSPSymbols[0])
 				leftPar++;
 			//Not a digit, but a )
-			else if (input[i] == allowedSPSymbols[1])
+			if (input[i] == allowedSPSymbols[1])
+			{
 				rightPar++;
+				//Enforcing case that there has to be an operator between sets of parentheses
+				if (i < input.length() - 1 && input[i + 1] == allowedSPSymbols[0])
+					return false;
+			}
 		}
 		if (i>0 && i < input.length() - 1)
 		{
+			//Negative sign
+			if (input[i] == allowedSPSymbols[6])
+				//if next char is not a digit AND next char is not [(]
+				if (!isdigit(input[i + 1]) && input[i + 1] != allowedSPSymbols[0])
+					return false;
 			//() case
 			if ((input[i] == allowedSPSymbols[0] && input[i + 1] == allowedSPSymbols[1]))
 				return false;
-			//Regular operator can only have a digit or ) in the left OR a digit or ( on the right
-			for (int j = 2; j < spsLength-1; j++)
+			//Operators +*/^ can only have a DIGIT OR [)] in the left OR a DIGIT, [(] or [-] on the right side
+			for (int j = 2; j < allowedSPSymbols.length() - 2; j++)
 			{
+				//If [i] is an allowed operator
 				if (input[i] == allowedSPSymbols[j])
 				{
-					if(!isdigit(input[i + 1]) && (input[i + 1] != allowedSPSymbols[0]))
+					//but the next char is not a digit AND next char is not [(]
+					if(!isdigit(input[i + 1]) && (input[i + 1] != allowedSPSymbols[0]) && (input[i + 1] != allowedSPSymbols[6]))
 						return false;
-					else if (!isdigit(input[i - 1]) && (input[i - 1] != allowedSPSymbols[1]))
+					//OR the previous char is not a digit AND previous char is not [(]
+					else if (!isdigit(input[i - 1]) && (input[i - 1] != allowedSPSymbols[1]) && (input[i + 1] != allowedSPSymbols[6]))
 						return false;
 				}
 			}
 			//[.] can only have digits on both sides
 			if (input[i] == allowedSPSymbols[7])
 			{
-				if (!isdigit(input[i + 1]) && !isdigit(input[i - 1]))
+				if (!isdigit(input[i + 1]) || !isdigit(input[i - 1]))
 					return false;
 			}
 		}
