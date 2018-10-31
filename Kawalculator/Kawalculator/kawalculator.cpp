@@ -1,8 +1,14 @@
+/*
+*	Jose Alonso
+*	CS480
+*	Lab03
+*/
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <vector>
-
+#include <stack>
+#include <math.h>
 
 using namespace std;
 
@@ -13,7 +19,19 @@ string allowedSPSymbols = "()+*/^-.";
 //Function Prototypes
 bool isValidSPChar(char letter);
 bool validateInput(string input);
+vector<string> tokenize(string input);
+vector<string> transformToRPN(const vector<string> &tokens);
+double evaluateRPN(vector<string> expression);
+bool tryParsingNum(const string &number);
+bool isOperator(const string &c);
+bool isDouble(const string &n);
+int getOpPriority(const string &c);
 
+/*
+*	RPN algorithm is based on Karim Oumghar's solution shown in
+*	https://simpledevcode.wordpress.com/2015/01/03/convert-infix-to-reverse-polish-notation-c-implementation/
+*	https://simpledevcode.wordpress.com/2014/03/07/using-stacks-to-evaluate-prefix-postfix-notation-expressions-polish-notation/
+*/
 
 //Main function
 int main(int argc, char *argv[])
@@ -47,57 +65,20 @@ int main(int argc, char *argv[])
 		}
 
 		//Prints validated input
-		cout << '\t' << input << " = " <<endl <<endl;
+		cout << '\t' << input << " = " ;
 
-		//Tokenizes input based on allowed characters
+		//Tokenizing the string
+		vector<string> tokens = tokenize(input);
 		
-		vector<string> wordVector;
-		int len = 0, i=0,j = 0;
-		for (i = 0; i < input.length(); i++)
-		{
-			//If [i] is a digit, ot iterates until it find a non digit non period
-			if (isdigit(input[i]) || input[i]=='.')
-			{
-				j = i;
-				while (isdigit(input[j]) || input[j] == '.')
-				{
-					len++;
-					j++;
-				}
-				//negative sign case
-				if (i > 0 && input[i - 1] == '-')
-				{
-					i--;
-					len++;
-				}
-				if (i > 1 && input[i - 1] == '-' && !isdigit(input[i - 2]))
-				{
-					i--;
-					len++;
-				}
-				//pushes number into stack
-				wordVector.push_back(input.substr(i, len));
-				i = j - 1;
-				len = 0;
-			}
-			else 
-			{			
-				if (input[i] == '-')
-				{
-					if (i == 0)
-						continue;
-					if (i>0 && i<input.length() - 1)
-						if (!isdigit(input[i - 1]) && !isdigit(input[i + 1]))
-							wordVector.push_back(input.substr(i, 1));
-				}
-				else
-					wordVector.push_back(input.substr(i, 1));
-			}
-		}
 		//Tokens
-		for (int i = 0; i<wordVector.size(); i++)
-			cout << wordVector[i] << "\n";
-			
+		//cout << endl;
+		//for (int i = 0; i<tokens.size(); i++)
+		//	cout << tokens[i] << "\n";
+		//cout << endl;
+
+		//RPNAlgorithm
+		cout << evaluateRPN(transformToRPN(tokens))<<endl;
+				
 		cout << endl;
 		//Menu part 2
 		while (true) {
@@ -119,26 +100,207 @@ int main(int argc, char *argv[])
 	}
 }
 
+//Transforms infix to postfix
+vector<string> transformToRPN(const vector<string> &tokens)
+{
+	vector<string> resultStack;//output vector
+	stack<string> tempStack;//main stack
+
+	for (int i = 0; i < tokens.size(); i++)  
+	{
+		if (tryParsingNum(tokens[i]))
+			resultStack.push_back(tokens[i]);
+
+		if (tokens[i] == "(")
+			tempStack.push(tokens[i]);
+
+		if (tokens[i] == ")")
+		{
+			while (!tempStack.empty() && tempStack.top() != "(")
+			{
+				resultStack.push_back(tempStack.top());
+				tempStack.pop();
+			}
+			tempStack.pop();
+		}
+
+		if (isOperator(tokens[i]))
+		{
+			while (!tempStack.empty() && getOpPriority(tempStack.top()) >= getOpPriority(tokens[i]))
+			{
+				resultStack.push_back(tempStack.top());
+				tempStack.pop();
+			}
+			tempStack.push(tokens[i]);
+		}
+	}
+	//pop any remaining operators from the stack and insert to outputlist
+	while (!tempStack.empty())
+	{
+		resultStack.push_back(tempStack.top());
+		tempStack.pop();
+	}
+	//Optional - Prints RPN expression
+	for (unsigned int i = 0; i < resultStack.size(); i++)
+	{
+		cout << resultStack[i] << " ";
+	}
+	cout << "= ";
+	return resultStack;
+}
+
+double evaluateRPN(vector<string> expression)
+{
+	double result = 0.0, n = 0.0;
+	stack<double> s;
+	//reverse(expression.begin(), expression.end());
+	for (int i = 0; i < expression.size(); i++)
+	{
+
+		if (isDouble(expression[i]) == true)
+		{
+			n = stod(expression[i]);
+			s.push(n);
+		}
+		if (expression[i] == "+")
+		{
+			double x = s.top();
+			s.pop();
+			double y = s.top();
+			s.pop();
+			result = x + y;
+			s.push(result);
+		}
+		if (expression[i] == "-")
+		{
+			double x = s.top();
+			s.pop();
+			double y = s.top();
+			s.pop();
+			result = y - x;
+			s.push(result);
+		}
+		if (expression[i] == "*")
+		{
+			double x = s.top();
+			s.pop();
+			double y = s.top();
+			s.pop();
+			result = x*y;
+			s.push(result);
+		}
+		if (expression[i]== "/")
+		{
+			double x = s.top();
+			s.pop();
+			double y = s.top();
+			s.pop();
+			if (x != 0)
+				result = y / x;
+			else
+			{
+				cout << "Couldn't perform division by zero!" << endl;
+				break;
+			}
+			s.push(result);
+		}
+		if (expression[i]== "^")
+		{
+			double x = s.top();
+			s.pop();
+			double y = s.top();
+			s.pop();
+			result = pow(y,x);
+			s.push(result);
+		}
+		if (expression[i] == "#")
+		{
+			double x = s.top();
+			s.pop();
+			result = x*(-1);
+			s.push(result);
+		}
+	}
+	return result;
+}
+
+bool isDouble(const string& s)
+{
+	try
+	{
+		stod(s);
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+vector<string> tokenize( string input)
+{
+	//Tokenizes input based on allowed characters
+	vector<string> wordVector;
+	int len = 0, i = 0, j = 0;
+	for (i = 0; i < input.length(); i++)
+	{
+		//If [i] is a digit, ot iterates until it find a non digit non period
+		if (isdigit(input[i]) || input[i] == '.')
+		{
+			j = i;
+			while (isdigit(input[j]) || input[j] == '.')
+			{
+				len++;
+				j++;
+			}
+			//negative sign case
+			/*if (i == 1 && input[i - 1] == '-')
+			{
+				//input.at(i) = '#';
+				//i--;
+				len++;t
+			}
+			if (i > 1 && input[i - 1] == '-' && !isdigit(input[i - 2]))
+			{
+				input.at(i) = '#';
+				i--;
+				len++;
+			*/
+			//pushes number into stack
+			wordVector.push_back(input.substr(i, len));
+			i = j - 1;
+			len = 0;
+		}
+		else
+		{
+			if (input[i] == '-')
+			{
+				if (i == 0)
+					wordVector.push_back("#");
+				if (i > 0 && i < input.length() - 1)
+				{
+					if (!isdigit(input[i - 1]) && isdigit(input[i + 1]))
+						wordVector.push_back("#");
+					else
+						wordVector.push_back(input.substr(i, 1));
+				}
+			}
+			else
+				wordVector.push_back(input.substr(i, 1));
+		}
+	}
+
+	return wordVector;
+}
+
 bool isValidSPChar(char letter)
 {
 	bool valid = false;
-	
-
 	for (int i = 0; i < allowedSPSymbols.length(); i++)
 		if (letter == allowedSPSymbols[i])
 			valid = true;
 	return valid;
 }
-/*
-int nextTokenDelimiter(const string &input, int startPoint)
-{
-	int valid = false;
-
-	for (int i = startPoint; i < input.length(); i++)
-		if (letter == allowedSPSymbols[i])
-			valid = true;
-	return valid;
-}*/
 
 bool validateInput(string input)
 {
@@ -239,4 +401,46 @@ bool validateInput(string input)
 		return false;
 
 	return true;
+}
+
+bool tryParsingNum(const string &symbol)
+{
+	bool isNumber = false;
+	for (unsigned int i = 0; i < symbol.size(); i++)
+	{
+		if (!isdigit(symbol[i]))
+		{
+			isNumber = false;
+		}
+		else
+		{
+			isNumber = true;
+		}
+	}
+	return isNumber;
+}
+
+int getOpPriority(const string &c)
+{
+	if (c == "^" || c == "#")
+	{
+		return 3;
+	}
+	if (c == "*" || c == "/")
+	{
+		return 2;
+	}
+	if (c == "+" || c == "-")
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+//
+bool isOperator(const string &c)
+{
+	return (c == "+" || c == "-" || c == "*" || c == "/" || c == "^" || c == "#");
 }
